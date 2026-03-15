@@ -110,12 +110,12 @@ With the virtual environment activated and `.env` configured:
 cd "C:\Users\shash\Downloads\The-Pitch-Visualiser-main\The-Pitch-Visualiser-main"
 .\venv\Scripts\activate
 
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8011
+.\venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8050
 ```
 
 Then open your browser at:
 
-- `http://127.0.0.1:8011/` (or `http://localhost:8011/`)
+- `http://127.0.0.1:8050/` (or `http://localhost:8050/`)
 
 ### 4.1. Using the Interface
 
