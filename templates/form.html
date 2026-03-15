@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Pitch Visualizer</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+min-height:100vh;
+padding:20px;
+}
+
+.container{
+max-width:1200px;
+margin:auto;
+background:white;
+border-radius:20px;
+box-shadow:0 20px 60px rgba(0,0,0,0.3);
+overflow:hidden;
+}
+
+.header{
+background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+color:white;
+padding:40px;
+text-align:center;
+}
+
+.header h1{
+font-size:2.5em;
+margin-bottom:10px;
+}
+
+.content{
+padding:40px;
+}
+
+textarea{
+width:100%;
+min-height:150px;
+padding:15px;
+border:2px solid #e0e0e0;
+border-radius:10px;
+font-size:16px;
+resize:vertical;
+}
+
+textarea:focus{
+outline:none;
+border-color:#667eea;
+}
+
+select{
+width:100%;
+padding:12px;
+border-radius:10px;
+border:2px solid #e0e0e0;
+margin-top:10px;
+margin-bottom:20px;
+}
+
+button{
+width:100%;
+padding:15px;
+background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+color:white;
+border:none;
+border-radius:10px;
+font-size:18px;
+font-weight:600;
+cursor:pointer;
+}
+
+button:hover{
+transform:translateY(-2px);
+box-shadow:0 10px 20px rgba(102,126,234,0.4);
+}
+
+.loading{
+display:none;
+text-align:center;
+padding:20px;
+}
+
+.loading.active{
+display:block;
+}
+
+.spinner{
+border:4px solid #f3f3f3;
+border-top:4px solid #667eea;
+border-radius:50%;
+width:40px;
+height:40px;
+animation:spin 1s linear infinite;
+margin:auto;
+}
+
+@keyframes spin{
+0%{transform:rotate(0deg);}
+100%{transform:rotate(360deg);}
+}
+
+.storyboard{
+margin-top:40px;
+display:none;
+}
+
+.storyboard.active{
+display:block;
+}
+
+.panels{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+gap:30px;
+}
+
+.panel{
+background:#f9f9f9;
+border-radius:15px;
+overflow:hidden;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+.panel img{
+width:100%;
+height:300px;
+object-fit:cover;
+}
+
+.panel-content{
+padding:20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+<h1>🎨 The Pitch Visualizer</h1>
+<p>Transform your narrative into a visual storyboard</p>
+</div>
+
+<div class="content">
+
+<textarea id="textInput" placeholder="Enter your story..."></textarea>
+
+<select id="styleSelect">
+<option value="digital art">Digital Art</option>
+<option value="photorealistic">Photorealistic</option>
+<option value="watercolor">Watercolor</option>
+<option value="comic book">Comic Book</option>
+</select>
+
+<button onclick="generateStoryboard()">Generate Storyboard</button>
+
+<div class="loading" id="loading">
+<div class="spinner"></div>
+<p>Generating storyboard...</p>
+</div>
+
+<div class="storyboard" id="storyboard">
+
+<h2>Your Storyboard</h2>
+
+<div class="panels" id="panels"></div>
+
+</div>
+
+</div>
+</div>
+
+<script>
+
+async function generateStoryboard(){
+
+const text=document.getElementById("textInput").value
+const style=document.getElementById("styleSelect").value
+
+const loading=document.getElementById("loading")
+const storyboard=document.getElementById("storyboard")
+
+loading.classList.add("active")
+
+const response=await fetch("/generate",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({text,style})
+})
+
+const data=await response.json()
+
+loading.classList.remove("active")
+
+displayStoryboard(data.storyboard)
+
+storyboard.classList.add("active")
+
+}
+
+function displayStoryboard(storyboard){
+
+const panels=document.getElementById("panels")
+
+panels.innerHTML=""
+
+storyboard.forEach(scene=>{
+
+const panel=document.createElement("div")
+
+panel.className="panel"
+
+panel.innerHTML=`
+
+<img src="/static/${scene.image_path}">
+
+<div class="panel-content">
+
+<p>${scene.text}</p>
+
+<p style="font-size:12px;color:gray">
+Prompt: ${scene.prompt}
+</p>
+
+</div>
+
+`
+
+panels.appendChild(panel)
+
+})
+
+}
+
+</script>
+
+</body>
+</html>
